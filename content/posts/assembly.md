@@ -1,7 +1,7 @@
 ---
 title: "Why would you want more than machine language?"
 date: 2020-06-07T11:54:33+02:00
-draft: true
+draft: false
 ---
 
 ***(a short history of the birth of assembly)***
