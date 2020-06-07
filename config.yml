@@ -1,0 +1,14 @@
+baseURL: "https://blog.deta.sh"
+languageCode: "en-us"
+title: "Deta Blog"
+theme: "contrast"
+
+menu:
+  main:
+  - {name: "Blog Home", url: "/", identifier: "home", weight: 1}
+  - {name: "deta.sh", url: "https://www.deta.sh", identifier: "deta", weight: 2}
+  remote:
+  - {name: "Mail", url: "mailto:hello@deta.sh", identifier: "envelope", weight: 1}
+  - {name: "Twitter", url: "https://twitter.com/detahq", identifier: "twitter", weight: 2}
+  - {name: "Subscribe", url: "/index.xml", identifier: "rss", weight: 3}
+

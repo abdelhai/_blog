@@ -1,5 +1,5 @@
 {
     "redirects": [
-      { "source": "/assembly", "destination": "/posts/assembly" }
+      { "source": "/assembly/", "destination": "/posts/assembly/" }
     ]
   }
