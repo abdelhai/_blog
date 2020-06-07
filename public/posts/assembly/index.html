@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<title>Why would you want more than machine language? | Deta Blog</title>
+<meta charset="utf-8">
+<meta name="generator" content="Hugo 0.72.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://blog.deta.sh/posts/assembly/">
+<link rel="alternate" type="application/rss+xml" href="" title="Deta Blog">
+<style>
+@media (prefers-color-scheme: light) {
+  html {
+    background: #ffffff;
+    color: #1c1d22;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    background: #1c1d22;
+    color: #ffffff;
+  }
+}
+
+html {
+  font-size: 16px;
+  font-size: calc(0.8rem + 0.3vw);
+}
+
+body {
+  font-family: "Karla", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Roboto", sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+}
+
+b, strong, th {
+  font-weight: 600;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+article a {
+  color: #68f;
+}
+
+header time {
+  color: #8e8e91;
+}
+
+hr {
+  border: 1px solid rgba(142, 142, 145, 0.3);
+  margin: 2em 0;
+}
+
+article:not(:last-child) {
+  border-bottom: 1px solid rgba(142, 142, 145, 0.12);
+}
+
+blockquote {
+  background: rgba(142, 142, 145, 0.06);
+  border-left: 3px solid rgba(142, 142, 145, 0.9);
+  padding: 1px 1.5em;
+  opacity: .75;
+}
+
+blockquote, figure {
+  margin: 1em 0;
+}
+
+img, li {
+  margin: .5em 0;
+}
+
+img {
+  border-radius: 2px;
+  max-width: 100%;
+  height: auto;
+}
+
+table {
+  width: 100%;
+  border-spacing: 1px;
+  box-shadow: 0 0 0 1px rgba(142, 142, 145, 0.12) inset;
+}
+
+th, td {
+  padding: .5em 1em;
+  box-shadow: 0 0 0 1px rgba(142, 142, 145, 0.12);
+}
+
+tr:hover, tr:nth-child(odd) td {
+  background: rgba(142, 142, 145, 0.04);
+}
+
+pre {
+  background: rgba(142, 142, 145, 0.12);
+  border-radius: 2px;
+  font-size: .8em;
+  margin: 1.5em 0;
+  padding: .8em 1.2em;
+  overflow-x: auto;
+}
+
+:not(pre) > code {
+  font-size: .9em;
+  background: rgba(142, 142, 145, 0.15);
+  opacity: .7;
+  border-radius: 2px;
+  margin: 0 .1em;
+  padding: .2em .4em;
+}
+
+body > header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: 0 0 .6em rgba(28, 29, 34, 0.05);
+  border-bottom: 1px solid rgba(142, 142, 145, 0.16);
+}
+
+body > header > a {
+  font-size: 1.3em;
+}
+
+article header {
+  margin-bottom: 1.5em;
+}
+
+article header h1 {
+  font-size: 1.8em;
+  margin: 0 0 .1em;
+}
+
+nav {
+  margin: .5em -.8em;
+}
+
+nav a {
+  margin: .5em .8em;
+}
+
+body > header, body > article, body > footer {
+  padding: 1.5em;
+}
+
+@media (min-width: 32em) {
+  body > header, body > article, body > footer {
+    padding: 1.75em calc(38% - 12em);
+  }
+}
+
+.archive li {
+  font-size: 1.1em;
+}
+
+.archive time {
+  display: inline-block;
+  min-width: 10ch;
+  margin: 0 .2em;
+}
+
+.hidden {
+  display: none;
+}
+
+.more {
+  margin: 2em 0 1em;
+}
+
+.more a {
+  border-radius: 2px;
+  border: 1.5px solid #68f;
+  padding: .4em .8em;
+  transition: .2s;
+}
+
+.more a:hover {
+  color: #fff;
+  background: #68f;
+  text-decoration: inherit;
+}
+
+.icons svg {
+  height: 1em;
+  width: 1em;
+  fill: currentColor;
+  transition: .2s color;
+  vertical-align: middle;
+  margin-bottom: .15em;
+}
+</style>
+
+<body>
+
+<header class="icons">
+  
+    <a href="https://blog.deta.sh">Deta Blog</a>
+  
+  
+  
+</header>
+
+<article>
+  <header>
+    <h1>Why would you want more than machine language?</h1>
+    <time datetime="2020-06-07T11:54:33&#43;02:00">June 07, 2020</time>
+  </header>
+  <p><em><strong>(a short history of the birth of assembly)</strong></em></p>
+<p>The use of assembly language and an assembler was an idea that evolved at the dawn of early digital <em>stored program computers</em>, in the decade following the Second World War. <a href="https://en.wikipedia.org/wiki/Richard_Hamming">Richard Hamming</a> reports an estimate that the use of assembly language represented a 2x improvement on programmer productivity <a href="#hamming">[p. 31]</a>.</p>
+<p>Nonetheless, it took awhile to catch on amongst experienced programmers, many of whom continued to program in the earlier <em>machine code</em>.  Hamming reports of these programmers dismissing assembly as &lsquo;sissy stuff&rsquo; and there are legends of towering figures in computing being quite dismissive of it. This piece is a short historical survey of the early development behind initial assembly languages and samples some of these early reactions to it.</p>
+<h2 id="programming-before-assembly">Programming Before Assembly</h2>
+<p>At the dawn of assembly, the model of computing which was taking shape was that of the <em>stored program computer</em>. The ideas for the <em>stored program computer</em> sprang out of the <a href="https://en.wikipedia.org/wiki/ENIAC">ENIAC Project</a> and its shortcomings.  One of the early shortcomings of the ENIAC was that it required significant hardware modifications each time a new program was run <a href="#campbell">[p.75]</a>.  <a href="https://en.wikipedia.org/wiki/John_von_Neumann">John von Neumann</a> did consulting work on this project and outlined the ideas for improvement from this collaboration with the ENIAC team in the <a href="http://web.eah-jena.de/~kleine/history/machines/VonNeumann-1stDraftReportEDVAC.pdf">initial report on the EDVAC</a>, though there are questions about who should get credit for the ideas <a href="#hamming">[p. 24]</a><a href="#campbell">[p. 77]</a>.</p>
+<p>One of the most important of these ideas was to organize the computer such that the program being executed is itself also stored in the computer&rsquo;s memory&ndash;this way, the computer itself did not need to be tediously reconfigured for each new program <a href="#campbell">[p. 75-76]</a>.</p>
+<h2 id="what-is-assembly">What is Assembly?</h2>
+<p>Stored program computers understand and can execute <em>machine code</em>, code expressed in numerical form (many of the earliest computers in pure binary). Below is a very short snippet of a more modern version of such machine code:</p>
+<p><code>6689C3</code></p>
+<p>From a human&rsquo;s perspective, it&rsquo;s not very intuitive, and if you are not incredibly immersed in a specific set of machine code, it is  <em>meaningless</em> (it is also not meant to be the hex code for a <a href="https://www.color-hex.com/color/6689c3">seaish looking blue</a>).</p>
+<p>In contrast, the below code is something a human with knowledge of English can get some type of idea about, even with little background.</p>
+<p><code>mov bx, ax</code></p>
+<p>The second snippet is assembly code, which is read by an <em>assembler</em> and translated into the first snippet for execution by a computer.</p>
+<p>In <em>Assemblers and Loaders</em>, an assembler is described as <a href="#saloman">[p. 1]</a>:</p>
+<blockquote>
+<p>&hellip; a translator that translates source instructions (in symbolic language) into target instructions (in machine language), on a one to one basis.</p>
+</blockquote>
+<p>For early <em>stored program computers</em>, humans had to <em>first do this translation</em> themselves <em>before</em> they could execute the programs. The idea behind assembly was to <em>use the machine itself</em> to translate between a more programmer friendly notation and the code the machine could understand, because computers are great at manipulating symbols at a high speed and precision <a href="#campbell">[p. 168]</a>. <a href="https://en.wikipedia.org/wiki/Richard_Hamming">Richard Hamming</a> reports an estimate that the use of assembly language represented a 2x improvement on programmer productivity <a href="#hamming">[p. 31]</a>.</p>
+<h2 id="the-development-of-assembly-on-early-stored-program-computers">The Development of Assembly on Early Stored Program Computers</h2>
+<p>Inspired by von Neumann and the ideas in the EDVAC report, two British research camps started working on stored program computers at the end of the 1940s, leading to some of the earliest assemblers.</p>
+<p><a href="https://en.wikipedia.org/wiki/Andrew_Donald_Booth">Andrew Booth</a> led the ARC project out of Birbeck College, with <a href="https://en.wikipedia.org/wiki/Kathleen_Booth">Kathleen Booth</a> (born as Britten) as an assistant — Kathleen is credited with creating an assembler for the &lsquo;ARC2&rsquo;. Meanwhile, <a href="https://en.wikipedia.org/wiki/Maurice_Wilkes">Maurice Wilkes</a> led the EDSAC project out of Cambridge with David Wheeler as an assistant — Wheeler is credited with creating the EDSAC&rsquo;s assembler <a href="#campbell">[p. 81]</a>.</p>
+<p>The tedium of translating human symbolic understandings of programs into machine-readable programs led to the early assemblers.</p>
+<h3 id="the-arc-project--kathleen-booth">The ARC Project &amp; Kathleen Booth</h3>
+<p>Kathleen was working with Andrew on the ARC, a specialized computer for calculating Fourier synteses 12-24x faster than a research student could do using traditional methods <a href="https://www.ams.org/journals/mcom/1954-08-046/S0025-5718-54-99336-9/S0025-5718-54-99336-9.pdf">[p. 102]</a>. After visiting von Neumann in Princeton, they constructed the ARC2, which was a <a href="https://www.i-programmer.info/history/people/1253-andrew-booth.html">&lsquo;stored program computer&rsquo;</a>.</p>
+<p>She and her husband released a few publications about this machine in 1947, one of which is <a href="http://www.mt-archive.info/Booth-1947.pdf"><em>General Considerations in the Design of an All Purpose Electronic Digital Computer</em></a>. The second, <em>Coding For A.R.C</em>, is believed to contain her <a href="https://hackaday.com/2018/08/21/kathleen-booth-assembling-early-computers-while-inventing-assembly/">assembly language for the ARC2</a>. There is little documented about this second report and, as far as we know, there is no digital copy of <em>Coding For A.R.C.</em>. Birbeck College only goes as far as to say she <a href="https://www.dcs.bbk.ac.uk/about/history/">&lsquo;developed a very early assembly language&rsquo;</a>.</p>
+<h3 id="edsac--david-wheeler">EDSAC &amp; David Wheeler</h3>
+<p>The story of David Wheeler and the EDSAC is more widely documented.</p>
+<p>As it goes, Maurice Wilkes led the EDSAC project (after visiting the United States and learning about the EDVAC) to launch a stored program computer at Cambridge University. The EDSAC became operational in May 1949 <a href="#campbell">[85]</a>. During this project Wilkes noticed that &lsquo;assembling&rsquo; <em>is something computers are well equipped to do;</em> he put David Wheeler on this job for a doctorate project <a href="#campbell">[168-169]</a>.</p>
+<p>The result of this project was the <em>Initial Orders</em> program, completed in May 1949, which would translate more human friendly punched codes into binary, and was loaded into memory as a <a href="https://www.cl.cam.ac.uk/~mr10/Edsac/edsacposter.pdf">&lsquo;bootstrap program&rsquo;</a>.</p>
+<p>Wikipedia cites the earlier source crediting Kathleen Booth as the inventor of assembly. Her <em>Coding for A.R.C.</em> piece was released in 1947, while Wheeler&rsquo;s Initial orders came online later in 1949. He is credited by the IEEE Computer Society as having created the first <a href="https://www.computer.org/profiles/david-wheeler">&lsquo;assembly language&rsquo;</a>. As far as we are aware, there is no digital copy of <em>Coding for A.R.C.</em>, and it is something we would love to see come online.</p>
+<h3 id="ibms-early-commercial-assemblers">IBMs Early Commercial Assemblers</h3>
+<p>In the early 1950s, IBM&rsquo;s first commercial computers also had assemblers running. These assemblers took another step forwards from the early academics who developed assemblers. The earlier assemblers used more human friendly symbols for &lsquo;operations&rsquo;, but computer addresses were still fixed in a program&rsquo;s code. This had the downside that programmers who encountered and corrected bugs needed to re-assign a chain of subsequent addresses by hand or use an alternate method and end up with &lsquo;spaghetti code&rsquo; <a href="#hamming">[p. 25]</a>.</p>
+<p>With IBM&rsquo;s assemblers, <em>symbolic</em> addresses were introduced, where the assembler did the work of address assignment for the programmer <a href="(https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=4640454)">[p. 116]</a>. Both IBM&rsquo;s first commercial scientific (<a href="https://en.wikipedia.org/wiki/IBM_701">the 701</a>) and business (<a href="https://en.wikipedia.org/wiki/IBM_650">the 650</a>) computers had assembly languages with symbolic addresses. For the 701, Nathaniel Rochester developed the <a href="https://ia600101.us.archive.org/25/items/symbolic-programming/Image111817152723.facing_text.pdf">*Symbolic Assembly Program (SAP) in 1953</a>. For the 650, Stan Poley <a href="http://www.columbia.edu/cu/computinghistory/650.html">developed SOAP in 1955</a>, which improved the performance of programs by the intelligent assignment of addresses <a href="#saloman">[p. 16]</a>.</p>
+<h2 id="early-responses-to-assembly">Early Responses to Assembly</h2>
+<p>Though most of the following perspectives are largely anecdotal, they suggest there is evidence that using <em>assembly language</em>, or anything higher than machine code, took time to catch on among practicing programmers and faced tremendous skepticism, even from earlier figures of our story, like Von Neumann (credit to <a href="http://worrydream.com/dbx/">this presentation</a> for the sources).</p>
+<p><a href="http://ei.cs.vt.edu/~history/VonNeumann.html">John Lee</a> reports anecdotes from von Neumann himself questioning the use of anything higher than machine code :</p>
+<blockquote>
+<p>In the 1950&rsquo;s von Neumann &hellip; was confronted with the FORTRAN concept; John Backus remembered von Neumann being unimpressed and that he asked &ldquo;why would you want more than machine language?&rdquo; &hellip;</p>
+</blockquote>
+<blockquote>
+<p>&hellip; Donald Gillies, one of von Neumann&rsquo;s students at Princeton, and later a faculty member at the University of Illinois, recalled in the mid-1970&rsquo;s that the graduates students were being &ldquo;used&rdquo; to hand assemble programs into binary for their early machine (probably the IAS machine). He took time out to build an assembler, but when von Neumann found out about he was very angry, saying (paraphrased), &ldquo;It is a waste of a valuable scientific computing instrument to use it to do clerical work.&rdquo;</p>
+</blockquote>
+<p>Richard Hamming, writing about programming on the IBM 701 (the same machine Rochester developed the assembler for) <a href="#hamming">[p. 25]</a>:</p>
+<blockquote>
+<p>I once spent a full year, with the help of a lady programmer from Bell Telephone Libraries, on one big problem coding in absolute binary for the IBM 701, which used all the 32K registers then available. After that experience I vowed never again would I ask anyone to do such labor. Having heard about a symbolic system from Poughkeepsie, IBM, I ask[ed] her to send for it and to use it on the next problem&hellip;As I expected, she reported it was much easier&hellip;</p>
+</blockquote>
+<blockquote>
+<p>So we told everyone about the new method, meaning about 100 people &hellip;</p>
+</blockquote>
+<blockquote>
+<p>&hellip; To my knowledge only one person —yes, only one—of all 100 showed any interest!</p>
+</blockquote>
+<p>He also writes (most probably about <a href="#ibms-early-commercial-assemblers">Rochester&rsquo;s system for the 701</a>) <a href="#hamming">[p. 26]</a>:</p>
+<blockquote>
+<p>Finally a more complete, and more useful, Symbolic Assembly Program (SAP) was devised after more years than you are apt to believe &hellip; most programmers continued their heroic absolute binary programming. At the time SAP first appeared I would guess about 1% of the older programmers were interested in it—using SAP was &ldquo;sissy stuff&rdquo; and a real programmer would not stoop to wasting machine capacity to do the assembly.</p>
+</blockquote>
+<p>As Rochester developed SAP out of Poughkeepsie for IBM, it raises the question if Hamming&rsquo;s two anecdotes were referring to one and the same event, and the earlier &lsquo;symbolic system&rsquo; was also Rochester&rsquo;s assembler.</p>
+<p>Nonetheless, Hamming estimates an initial interest level of about 1% amongst experienced programmers, despite his report of an estimated 2x productivity improvement.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>The anecdotal evidence suggests assembly language was far from an overnight success, despite the advantages it offered. Nonetheless zooming forwards, it&rsquo;s clear that the idea behind assembly took hold. At a more abstract level, the idea of &lsquo;<em>buffering the user from the machine itself</em>&rsquo;, most likely using the computers themselves to do so, has carried forwards with many new layers added on after assembly; Hamming cites a report that assembly and technologies after have boosted programmer productivity by a factor of 90 over a 30 year period <a href="#hamming">[p. 26, 31]</a>.</p>
+<h2 id="continued">Continued</h2>
+<p>If you read this and have better knowledge than we do, we would love to see:</p>
+<ol>
+<li>A copy of <em>&lsquo;Programming for A.R.C.'</em> online.</li>
+<li>More studies (esp. quantitative) or anecdotes on the adoption of assembly language.</li>
+<li>Your story or opinion on why programmers initially kept programming in machine code.</li>
+<li>Reports on the increase in programmer productivity since the internet.</li>
+</ol>
+<p>Please share with us!</p>
+<h2 id="references-cited-multiple-times">References Cited Multiple Times</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<ul>
+<li>Campbell-Kelly, Martin, William Aspray, Nathan Ensmenger and Jeffrey Yost. 2014. <em>Computer: A History of the Information Machine.</em>  Westview Press.</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<ul>
+<li>Hamming, Richard. 2005. <em>The Art and Science of Doing Engineering: Learning to Learn</em>  Gordon and Breach Science Publishers.</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<ul>
+<li>Salomon, David. 1993. <em>Assemblers and Loaders</em>. Ellis Horwood Ltd. <a href="http://www.davidsalomon.name/assem.advertis/asl.pdf">http://www.davidsalomon.name/assem.advertis/asl.pdf</a></li>
+</ul>
+
+</article>
+
+
+
+</body>
+
+</html>

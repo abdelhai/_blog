@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Deta Blog</title>
+    <link>https://blog.deta.sh/posts/</link>
+    <description>Recent content in Posts on Deta Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 07 Jun 2020 11:54:33 +0200</lastBuildDate>
+    
+	<atom:link href="https://blog.deta.sh/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Why would you want more than machine language?</title>
+      <link>https://blog.deta.sh/posts/assembly/</link>
+      <pubDate>Sun, 07 Jun 2020 11:54:33 +0200</pubDate>
+      
+      <guid>https://blog.deta.sh/posts/assembly/</guid>
+      <description>(a short history of the birth of assembly)
+The use of assembly language and an assembler was an idea that evolved at the dawn of early digital stored program computers, in the decade following the Second World War. Richard Hamming reports an estimate that the use of assembly language represented a 2x improvement on programmer productivity [p. 31].
+Nonetheless, it took awhile to catch on amongst experienced programmers, many of whom continued to program in the earlier machine code.</description>
+    </item>
+    
+  </channel>
+</rss>

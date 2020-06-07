@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://blog.deta.sh/</loc>
+    <lastmod>2020-06-07T11:54:33+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blog.deta.sh/posts/</loc>
+    <lastmod>2020-06-07T11:54:33+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blog.deta.sh/posts/assembly/</loc>
+    <lastmod>2020-06-07T11:54:33+02:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://blog.deta.sh/categories/</loc>
+  </url>
+  
+  <url>
+    <loc>https://blog.deta.sh/tags/</loc>
+  </url>
+  
+</urlset>
