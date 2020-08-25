@@ -1,6 +1,6 @@
 baseURL: "https://blog.deta.sh"
 languageCode: "en-us"
-title: "Deta Perspectives"
+title: "Deta Blog"
 theme: "contrast"
 
 menu:
