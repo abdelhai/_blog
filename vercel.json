@@ -1,5 +1,6 @@
 {
     "redirects": [
-      { "source": "/assembly/", "destination": "/posts/assembly/" }
+      { "source": "/assembly/", "destination": "/posts/assembly/" },
+      { "source": "/roam_clone/", "destination": "/posts/roam_clone/" }
     ]
   }
