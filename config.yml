@@ -1,11 +1,11 @@
 baseURL: "https://blog.deta.sh"
 languageCode: "en-us"
-title: "Deta Blog"
+title: "Deta Perspectives"
 theme: "contrast"
 
 menu:
   main:
-  - {name: "Blog Home", url: "/", identifier: "home", weight: 1}
+  - {name: "Home", url: "/", identifier: "Home", weight: 1}
   - {name: "deta.sh", url: "https://www.deta.sh", identifier: "deta", weight: 2}
   remote:
   - {name: "Mail", url: "mailto:hello@deta.sh", identifier: "envelope", weight: 1}
