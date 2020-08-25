@@ -1,9 +1,8 @@
 ---
 title: "Why would you want more than machine language?"
-date: 2020-06-07T11:54:33+02:00
+date: 2020-03-05
 draft: false
 ---
-
 ***(a short history of the birth of assembly)***
 
 
@@ -23,7 +22,7 @@ Stored program computers understand and can execute *machine code*, code express
 
 `6689C3`
 
-From a human's perspective, it's not very intuitive, and if you are not incredibly immersed in a specific set of machine code, it is  *meaningless* (it is also not meant to be the hex code for a [seaish looking blue](https://www.color-hex.com/color/6689c3)). 
+From a human's perspective, it's not very intuitive, and if you are not incredibly immersed in a specific set of machine code, it is  *meaningless*. 
 
 In contrast, the below code is something a human with knowledge of English can get some type of idea about, even with little background.
 
@@ -32,6 +31,7 @@ In contrast, the below code is something a human with knowledge of English can g
 The second snippet is assembly code, which is read by an *assembler* and translated into the first snippet for execution by a computer.
 
 In *Assemblers and Loaders*, an assembler is described as [[p. 1]](#saloman):
+
 > ... a translator that translates source instructions (in symbolic language) into target instructions (in machine language), on a one to one basis.
 
 
