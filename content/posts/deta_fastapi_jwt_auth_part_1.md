@@ -21,15 +21,15 @@ JWT (or JSON web tokens) are simply encrypted strings that encode some informati
 
 ### Tools
 
-- FastAPI : we are using FastAPI to build the application
-- Deta Base (Base)  : database for our application
-- Deta Micro : host our application
-- pyjwt : library for encoding and decoding JWT tokens
-- passlib[bcrypt] : password hashing library
+- [FastAPI](https://fastapi.tiangolo.com/): we are using FastAPI to build the application
+- Deta Base (Base) : database for our application
+- Deta Micro: host our application
+- `pyjwt`: library for encoding and decoding JWT tokens
+- `passlib[bcrypt]`: password hashing library
 
 ### Install
 
-To get started, create a folder for this project `fastapi-jwt` , and create a `requirements.txt` file with the following lines.
+To get started, create a folder for this project `fastapi-jwt` , and create a `requirements.txt` file with the following lines:
 
 ```python
 deta
@@ -43,17 +43,19 @@ Run the following command to install the libraries
 
 `pip install -r requirements.txt`
 
-Before we begin with the project we also need to get a project key from Deta base. We are using base to store user account information such as username and hashed password. 
+Before we begin with the project we also need to get a Deta project key to use with Deta Base. We are using Base to store user account information such as username and hashed password.  
 
-To do that, navigate to the [Deta Base](https://web.deta.sh/), and make an account. Now, click on the arrow on the top left. 
+To do that, navigate to the [Deta Console](https://web.deta.sh/)then click on the arrow on the top left.
+If you don't already have a Deta account, [create one for free](https://web.deta.sh/). Once you confirm your email, Deta will automatically generate a Project Key, this is the one we need, copy it and  store it securely.
+
 
 ![image](https://user-images.githubusercontent.com/20916697/114434048-2dbab380-9b88-11eb-8839-22bebae709ed.png)
 
-Create a new project and make sure to save the key!
+Create a new project and make sure to save the key in a secure place!
 
 ![image](https://user-images.githubusercontent.com/20916697/114434122-40cd8380-9b88-11eb-8ddc-7045ce5756ba.png)
 
-Add the key to your `env` variables like this `DETA_PROJECT_KEY="YOUR_COPIED_PROJECT_KEY"`
+Add the key to your environment variables like this `DETA_PROJECT_KEY=YOUR_COPIED_PROJECT_KEY`
 
 That's it for the setup, we have everything we need to get rolling. Let's go!
 
@@ -68,16 +70,15 @@ fastapi-jwt/
     ├── auth.py
     ├── user_modal.py
     └── requirements.txt
-    └── config.py
 ```
 
-In `[main.py](http://main.py)` , let's set up our FastAPI application, Deta Base, and skeletons for all the endpoints.  
+In `main.py` , let's set up our FastAPI application, Deta Base, and skeletons for all the endpoints.  
 
 ```python
 from fastapi import FastAPI, HTTPException
 from deta import Deta
 
-deta = Deta() # get project key from import jwt
+deta = Deta()
 users_db = deta.Base('users')
 
 app = FastAPI()
@@ -108,18 +109,18 @@ def not_secret_data():
 }
 ```
 
-Now let's head over to `[auth.py](http://auth.py)`, to handle the authentication logic:
+Now let's head over to `auth.py`, to handle the authentication logic:
 
 ```python
+import os
 import jwt # used for encoding and decoding jwt tokens
 from fastapi import HTTPException # used to handle error handling
 from passlib.context import CryptContext # used for hashing the password 
 from datetime import datetime, timedelta # used to handle expiry time for tokens
-from config import SECRET
 
 class Auth():
     hasher= CryptContext(schemes=['bcrypt'])
-    secret = SECRET
+    secret = os.getenv("APP_SECRET_STRING")
 
     def encode_password(self, password):
         return self.hasher.hash(password)
@@ -132,13 +133,7 @@ So far, we just imported all the tools from the libraries, and we created the `A
 
 We also have another function `verify_password` which checks if the plain password and the encoded password from `users_db` match. This can be useful to verify user in the `/login` endpoint. 
 
-Notice that the variable `secret` is getting something from `config.py` , so let's add that key to our file.
-
-Here is a look at the `config.py` file:
-
-```python
-SECRET="sUpErSeCrEt"
-```
+Notice that we get the variable `secret` from our environment, make sure to generate a long secure string and store it in your environment variables under the name `APP_SECRET_STRING`.
 
 Now that we have a way to verify passwords, and hash passwords, it is time to handle the logic for encoding and decoding JSON web tokens. The tokens are the essence of auth logic. 
 
@@ -176,15 +171,15 @@ That is all we need for the auth logic! Here is what the file looks like at the 
 `auth.py`
 
 ```python
+import os
 import jwt # used for encoding and decoding jwt tokens
 from fastapi import HTTPException # used to handle error handling
 from passlib.context import CryptContext # used for hashing the password 
 from datetime import datetime, timedelta # used to handle expiry time for tokens
-from config import SECRET
 
 class Auth():
     hasher= CryptContext(schemes=['bcrypt'])
-    secret = SECRET
+    secret = os.getenv("APP_SECRET_STRING")
 
     def encode_password(self, password):
         return self.hasher.hash(password)
