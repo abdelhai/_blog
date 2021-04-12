@@ -45,7 +45,7 @@ Run the following command to install the libraries
 
 Before we begin with the project we also need to get a Deta project key to use with Deta Base. We are using Base to store user account information such as username and hashed password.  
 
-To do that, navigate to the [Deta Console](https://web.deta.sh/)then click on the arrow on the top left.
+To do that, navigate to the [Deta Console ](https://web.deta.sh/)then click on the arrow on the top left.
 If you don't already have a Deta account, [create one for free](https://web.deta.sh/). Once you confirm your email, Deta will automatically generate a Project Key, this is the one we need, copy it and  store it securely.
 
 
