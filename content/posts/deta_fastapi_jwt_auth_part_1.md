@@ -1,9 +1,8 @@
 ---
 title: "Deta + FastAPI + JWT Auth Part 1"
-date: 2021-04-12
+date: 2021-04-13
 draft: false
 ---
-
 
 # Deta + FastAPI + JWT Auth Part 1
 
@@ -13,7 +12,7 @@ This is the first of a two part series on implementing authorization in a FastAP
 
 Implementing authorization can be useful, as it provides the client access to a specific set of functions, actions, data, etc. Consider an e-commerce website, you would want to make sure users are authorized before they can look at items in the cart. Another example is a chat application where only the owner has the right to add/remove people. 
 
-JWT (or JSON web tokens) are simply encrypted strings that encode some information about the client. These tokens are signed using a secret key or a public/private key. We will implement the former method. Essentially, when the client is logged in, the server sends back a response with a signed token. Subsequently, the client can send requests to the server with the token as a header to access authorized routes, data, functions etc. 
+JWT (or JSON web tokens) are simply base64 strings that encode some information about the client. These tokens are signed using a secret key or a public/private key. We will implement the former method. Essentially, when the client is logged in, the server sends back a response with a signed token. Subsequently, the client can send requests to the server with the token as a header to access authorized routes, data, functions etc. 
 
 ![image](https://user-images.githubusercontent.com/20916697/114433979-15e32f80-9b88-11eb-8bd9-a4bfb5f3b56c.png)
 
@@ -98,6 +97,10 @@ def signup():
 def login():
     return 'Login user endpoint'
 
+@app.get('/refresh_token')
+def refresh_token():
+    return 'New token'
+
 @app.post('/secret')
 def secret_data():
     return 'Secret data'
@@ -173,6 +176,19 @@ The `encode_token` function takes a username as a parameter and uses `pyjwt` to 
 
 `decode_token` takes a token as a parameter, and attempts to decode it using the `secret`. If there are any errors like expired token or an invalid token, we can simply raise an `HTTPException`. Otherwise, we can return the username. This will be helpful to us when the client interacts with protected data, functions, etc. We can use this function to simply verify if they have access to the response. 
 
+We need one more function to refresh a token when expired. 
+```python
+    def refresh_token(self, expired_token):
+        try:
+            payload = jwt.decode(expired_token, self.secret, algorithms=['HS256'], options= {'verify_exp': False})
+	    username = payload['sub']
+	    new_token = self.encode_token(username)
+            return {'token': new_token}
+        except jwt.InvalidTokenError:
+            raise HTTPException(status_code=401, detail='Invalid token')
+```
+Here we are using the same decode function from `pyjwt`, however, by including the option `{'verify_exp': False}` we can ignore the `ExpiredSignatureError` and get the username from the expired token. We can then use this to create a new one.
+
 That is all we need for the auth logic! Here is what the file looks like at the end:
 
 `auth.py`
@@ -212,6 +228,15 @@ class Auth():
             return payload['sub']
         except jwt.ExpiredSignatureError:
             raise HTTPException(status_code=401, detail='Token expired')
+        except jwt.InvalidTokenError:
+            raise HTTPException(status_code=401, detail='Invalid token')
+	    
+    def refresh_token(self, expired_token):
+        try:
+            payload = jwt.decode(expired_token, self.secret, algorithms=['HS256'], options= {'verify_exp': False})
+	    username = payload['sub']
+	    new_token = self.encode_token(username)
+            return {'token': new_token}
         except jwt.InvalidTokenError:
             raise HTTPException(status_code=401, detail='Invalid token')
 ```
