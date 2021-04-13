@@ -3,7 +3,6 @@ title: "Get started with FastAPI JWT authentication – Part 2"
 date: 2021-04-13
 draft: false
 ---
-
 # Get started with FastAPI JWT authentication – Part 2
 This is the second of a two part series on implementing authorization in a FastAPI application using Deta. In the previous article, we learned a bit about JWT, set up the project, and finished the building blocks of authorization logic. In this article, let's implement the logic, and deploy our app on Deta micros! [The full code is available here.](https://github.com/rohanshiva/Deta-FastAPI-JWT-Auth-Blog) 
 
