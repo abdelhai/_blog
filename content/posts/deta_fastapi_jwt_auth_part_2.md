@@ -247,10 +247,21 @@ Run the following commands in the same directory to deploy our app on Deta micro
 ```json
 deta login
 ```
+We also need to add a `.env` file with the secret.
+
+```
+APP_SECRET_STRING=SECRET_STRING
+```
+
+Now run the following commands to deploy our app on micros.
 
 ```python
 deta new 
+deta update -e .env
+deta deploy
 ```
+
+
 
 ## Summary
 
