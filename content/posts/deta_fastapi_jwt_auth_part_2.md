@@ -241,8 +241,7 @@ Response Body
 ```
 
 ## Deploy on Deta micros
-
-Run the following commands in the same directory to deploy our app on Deta micros.
+Before we begin, make sure to [install the Deta CLI ](https://docs.deta.sh/docs/cli/install) After installing, run the following commands in the same directory to deploy our app on Deta micros.
 
 ```json
 deta login
