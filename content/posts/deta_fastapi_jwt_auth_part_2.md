@@ -3,7 +3,6 @@ title: "Get started with FastAPI JWT authentication – Part 2"
 date: 2021-04-13
 draft: false
 ---
-
 # Get started with FastAPI JWT authentication – Part 2
 This is the second of a two part series on implementing authorization in a FastAPI application using Deta. In the previous article, we learned a bit about JWT, set up the project, and finished the building blocks of authorization logic. In this article, let's implement the logic, and deploy our app on Deta micros! [The full code is available here.](https://github.com/rohanshiva/Deta-FastAPI-JWT-Auth-Blog) 
 
@@ -248,10 +247,21 @@ Run the following commands in the same directory to deploy our app on Deta micro
 ```json
 deta login
 ```
+We also need to add a `.env` file with the secret.
+
+```
+APP_SECRET_STRING=SECRET_STRING
+```
+
+Now run the following commands to deploy our app on micros.
 
 ```python
 deta new 
+deta update -e .env
+deta deploy
 ```
+
+
 
 ## Summary
 
