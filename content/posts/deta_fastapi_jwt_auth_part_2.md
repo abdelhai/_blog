@@ -1,6 +1,6 @@
 ---
 title: "Get started with FastAPI JWT authentication – Part 2"
-date: 2021-04-13
+date: 2021-04-21
 draft: false
 ---
 # Get started with FastAPI JWT authentication – Part 2
@@ -8,25 +8,25 @@ This is the second of a two part series on implementing authorization in a FastA
 
 ## Implementing the auth logic
 
-Before we implement the auth logic, let's create a data modal for login and signup details. 
+Before we implement the auth logic, let's create a data model for login and signup details. 
 
-In `user_modal.py` :
+In `user_model.py` :
 
 ```python
 from pydantic import BaseModel
 
-class AuthModal(BaseModel):
+class AuthModel(BaseModel):
     username: str
     password: str
 ```
 
-This modal represents the data that we can expect from the client when they hit `/login` or `/signup` endpoints.
+This model represents the data that we can expect from the client when they hit `/login` or `/signup` endpoints.
 
 Update the `main.py` , with the following import statements
 
 ```python
 from auth import Auth
-from user_modal import AuthModal
+from user_model import AuthModel
 from fastapi import FastAPI, HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 ```
@@ -60,18 +60,19 @@ In this function we are checking if a user with the username already exists in o
 
 ```python
 @app.post('/login')
-def login(user_details: AuthModal):
+def login(user_details: AuthModel):
     user = users_db.get(user_details.username)
     if (user is None):
         return HTTPException(status_code=401, detail='Invalid username')
     if (not auth_handler.verify_password(user_details.password, user['password'])):
         return HTTPException(status_code=401, detail='Invalid password')
     
-    token = auth_handler.encode_token(user['key'])
-    return {'token': token}
+    access_token = auth_handler.encode_token(user['key'])
+    refresh_token = auth_handler.encode_refresh_token(user['key'])
+    return {'access_token': access_token, 'refresh_token': refresh_token}
 ```
 
-If the account with the username doesn't exist, or if the hashed password in the `users_db` doesn't match the input password we can simply raise an `HTTPException`. Otherwise, we can return the encoded JWT token using `encode_token`.
+If the account with the username doesn't exist, or if the hashed password in the `users_db` doesn't match the input password we can simply raise an `HTTPException`. Otherwise, we can return `access_token` and `refresh_token`.
 
 ```python
 @app.post('/secret')
@@ -92,11 +93,12 @@ The `/not_secret` endpoint is an example of an unprotected endpoint, which doesn
 ```python
 @app.get('/refresh_token')
 def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security)):
-    expired_token = credentials.credentials
-    return auth_handler.refresh_token(expired_token)
+    refresh_token = credentials.credentials
+    new_token = auth_handler.refresh_token(refresh_token)
+    return {'access_token': new_token}
 ```
 
-`/refresh_token` endpoint is also pretty simple, it receives an expired token which is then passed onto the the `refresh_token` function from auth logic to get the new token. 
+`/refresh_token` endpoint is also pretty simple, it receives a refresh token which is then passed onto the the function from auth logic to get a new token. 
 
 Here is a look at `main.py` at the end:
 
@@ -104,7 +106,8 @@ Here is a look at `main.py` at the end:
 from fastapi import FastAPI, HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from auth import Auth
-from user_modal import AuthModal
+from deta import Deta
+from user_model import AuthModel
 
 deta = Deta()
 users_db = deta.Base('users')
@@ -115,7 +118,7 @@ security = HTTPBearer()
 auth_handler = Auth()
 
 @app.post('/signup')
-def signup(user_details: AuthModal):
+def signup(user_details: AuthModel):
     if users_db.get(user_details.username) != None:
         return 'Account already exists'
     try:
@@ -127,20 +130,22 @@ def signup(user_details: AuthModal):
         return error_msg
 
 @app.post('/login')
-def login(user_details: AuthModal):
+def login(user_details: AuthModel):
     user = users_db.get(user_details.username)
     if (user is None):
         return HTTPException(status_code=401, detail='Invalid username')
     if (not auth_handler.verify_password(user_details.password, user['password'])):
         return HTTPException(status_code=401, detail='Invalid password')
     
-    token = auth_handler.encode_token(user['key'])
-    return {'token': token}
+    access_token = auth_handler.encode_token(user['key'])
+    refresh_token = auth_handler.encode_refresh_token(user['key'])
+    return {'access_token': access_token, 'refresh_token': refresh_token}
 
 @app.get('/refresh_token')
 def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security)):
-    expired_token = credentials.credentials
-    return auth_handler.refresh_token(expired_token)
+    refresh_token = credentials.credentials
+    new_token = auth_handler.refresh_token(refresh_token)
+    return {'access_token': new_token}
 
 @app.post('/secret')
 def secret_data(credentials: HTTPAuthorizationCredentials = Security(security)):
@@ -170,7 +175,7 @@ curl -X 'POST' \
 Response Body
 {
   "key": "flyingsponge",
-  "password": "$2b$12$/Gq7g40zZ4/sQ9iWfqVze.Jx5HI5XwCrERITGG/wZivuZ9jhkd0bK"
+  "password": "$2b$12$Ml66gTN0j4sAOkoDJ1aKnOmP0ye1FBNNk1QzEt0/6LgemgOUj469e"
 }
 ```
 
@@ -188,7 +193,8 @@ curl -X 'POST' \
 
 Response Body
 {
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTgyNDE1MjAsImlhdCI6MTYxODIzOTcyMCwic3ViIjoiZmx5aW5nc3BvbmdlIn0.SoMeSo_b9z4fC-XnR8bepUbFvWvSEw9rRQ9LMJNzm3k"
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTkwMTY4MzgsImlhdCI6MTYxOTAxNTAzOCwic3ViIjoiZmx5aW5nc3BvbmdlIn0.XnPaDwmj30M3vMOaPUOrqESIBNx0mctbjNW5jY8hIjQ",
+  "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTkwNTEwMzgsImlhdCI6MTYxOTAxNTAzOCwic3ViIjoiZmx5aW5nc3BvbmdlIn0.Pm68HQFM6NwUxnEjFUxxTiOYT3KBqchD_e2g0LfP5Co"
 }
 ```
 
@@ -198,7 +204,7 @@ Response Body
 curl -X 'POST' \
   'http://127.0.0.1:8000/secret' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTg5MzU3MzcsImlhdCI6MTYxODkzNTY3Nywic3ViIjoicm9oYW4ifQ.dja0E6SUaZfEvYVKySjLE9OLXOtob5pjpy3R_rlCD7c' \
+  -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTkwMTY2MTIsImlhdCI6MTYxOTAxNDgxMiwic3ViIjoicmFta2kifQ.U8fUN1x1Gz18f7oA_y7Z9DE-1FIH9Ps0sDilwORvmI8' \
   -d ''
 
 Response body
@@ -238,11 +244,10 @@ Now that the token is expired, let's get a new one
 curl -X 'GET' \
   'http://127.0.0.1:8000/refresh_token' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTg5MzU3MzcsImlhdCI6MTYxODkzNTY3Nywic3ViIjoicm9oYW4ifQ.dja0E6SUaZfEvYVKySjLE9OLXOtob5pjpy3R_rlCD7c'
-
+  -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTkwNTA3NzYsImlhdCI6MTYxOTAxNDc3Niwic3ViIjoicmFta2kifQ.2J0O4RKwEcABxe6hEX7ZshMo66J6D0dD6-hYeFLBFGg'
 Response Body
 {
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTg5MzU5MDcsImlhdCI6MTYxODkzNTg0Nywic3ViIjoicm9oYW4ifQ.VI1vqMZ2Mklue-bv5WtwhFxbVsbHkRHOr3fON49wpmE"
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTkwMTY2MTIsImlhdCI6MTYxOTAxNDgxMiwic3ViIjoicmFta2kifQ.U8fUN1x1Gz18f7oA_y7Z9DE-1FIH9Ps0sDilwORvmI8"
 }
 ```
 
