@@ -1,6 +1,6 @@
 ---
 title: "Get started with FastAPI JWT authentication – Part 1"
-date: 2021-04-13
+date: 2021-04-21
 draft: false
 ---
 
@@ -74,7 +74,7 @@ Here is how our folder structure will look like at the end:
 fastapi-jwt/
     ├── main.py
     ├── auth.py
-    ├── user_modal.py
+    ├── user_model.py
     └── requirements.txt
 ```
 
@@ -172,22 +172,38 @@ def decode_token(self, token):
             raise HTTPException(status_code=401, detail='Invalid token')
 ```
 
-The `encode_token` function takes a username as a parameter and uses `pyjwt` to encode the token. We are using `timedelta` to set the expiry of the token for 30 mins. We can use this function inside the `/login` endpoint, and return a token to the client. 
+The `encode_token` function takes a username as a parameter and uses `pyjwt` to create an `access_token`. We are using `timedelta` to set the expiry of the token for 30 mins. We can use this function inside the `/login` endpoint, and return a token to the client.
 
 `decode_token` takes a token as a parameter, and attempts to decode it using the `secret`. If there are any errors like expired token or an invalid token, we can simply raise an `HTTPException`. Otherwise, we can return the username. This will be helpful to us when the client interacts with protected data, functions, etc. We can use this function to simply verify if they have access to the response. 
 
-We need one more function to refresh a token when expired. 
+
+When the token expires, the application forces the user to login. To avoid this, we can create two tokens `access_token` and `refresh_token` when the user logins. The refresh token usually has a longer expiry time than the `access_token`, and will only be used to create a new token. Everytime the `access_token` expires, the client sends a request to the server to create a new `access_token` using the `refresh_token`. If the `refresh_token` expires then the client will be forced to login. 
+
+We need two more function to handle the `refresh_token` logic. 
 ```python
-    def refresh_token(self, expired_token):
+    def encode_refresh_token(self, username):
+    	payload = {
+            'exp' : datetime.utcnow() + timedelta(days=0, hours=10),
+            'iat' : datetime.utcnow(),
+            'sub' : username
+        }
+        return jwt.encode(
+            payload, 
+            self.secret,
+            algorithm='HS256'
+        )
+    def refresh_token(self, refresh_token):
         try:
-            payload = jwt.decode(expired_token, self.secret, algorithms=['HS256'], options= {'verify_exp': False})
+            payload = jwt.decode(refresh_token, self.secret, algorithms=['HS256'])
 	    username = payload['sub']
 	    new_token = self.encode_token(username)
-            return {'token': new_token}
+            return new_token
+	except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail='Refresh token expired')
         except jwt.InvalidTokenError:
-            raise HTTPException(status_code=401, detail='Invalid token')
+            raise HTTPException(status_code=401, detail='Invalid refresh token')
 ```
-Here we are using the same decode function from `pyjwt`, however, by including the option `{'verify_exp': False}` we can ignore the `ExpiredSignatureError` and get the username from the expired token. We can then use this to create a new one.
+As you can tell, we are setting the expiry time of the `refresh_token` to be 10 hours which is more than the `access_token`. Plus, we are simply using `refresh_token` to create a new `access_token`.
 
 That is all we need for the auth logic! Here is what the file looks like at the end:
 
@@ -231,14 +247,27 @@ class Auth():
         except jwt.InvalidTokenError:
             raise HTTPException(status_code=401, detail='Invalid token')
 	    
-    def refresh_token(self, expired_token):
+    def encode_refresh_token(self, username):
+    	payload = {
+            'exp' : datetime.utcnow() + timedelta(days=0, hours=10),
+            'iat' : datetime.utcnow(),
+            'sub' : username
+        }
+        return jwt.encode(
+            payload, 
+            self.secret,
+            algorithm='HS256'
+        )
+    def refresh_token(self, refresh_token):
         try:
-            payload = jwt.decode(expired_token, self.secret, algorithms=['HS256'], options= {'verify_exp': False})
+            payload = jwt.decode(refresh_token, self.secret, algorithms=['HS256'])
 	    username = payload['sub']
 	    new_token = self.encode_token(username)
-            return {'token': new_token}
+            return new_token
+	except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail='Refresh token expired')
         except jwt.InvalidTokenError:
-            raise HTTPException(status_code=401, detail='Invalid token')
+            raise HTTPException(status_code=401, detail='Invalid refresh token')
 ```
 
 In the next article, we will implement the logic in a FastAPI application and deploy our app on Deta micros! [The full code is available here.](https://github.com/rohanshiva/Deta-FastAPI-JWT-Auth-Blog)
