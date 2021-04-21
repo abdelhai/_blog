@@ -248,7 +248,7 @@ class Auth():
             raise HTTPException(status_code=401, detail='Invalid token')
 	    
     def encode_refresh_token(self, username):
-    	payload = {
+        payload = {
             'exp' : datetime.utcnow() + timedelta(days=0, hours=10),
             'iat' : datetime.utcnow(),
             'sub' : username
@@ -258,13 +258,14 @@ class Auth():
             self.secret,
             algorithm='HS256'
         )
+    
     def refresh_token(self, refresh_token):
         try:
             payload = jwt.decode(refresh_token, self.secret, algorithms=['HS256'])
-	    username = payload['sub']
-	    new_token = self.encode_token(username)
+            username = payload['sub']
+            new_token = self.encode_token(username)
             return new_token
-	except jwt.ExpiredSignatureError:
+        except jwt.ExpiredSignatureError:
             raise HTTPException(status_code=401, detail='Refresh token expired')
         except jwt.InvalidTokenError:
             raise HTTPException(status_code=401, detail='Invalid refresh token')
