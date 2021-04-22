@@ -269,6 +269,7 @@ Now we need to update our micro by doing:
 deta new 
 deta update -e .env
 deta deploy
+deta visor disable
 ```
 
 
