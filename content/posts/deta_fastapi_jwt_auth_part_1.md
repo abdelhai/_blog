@@ -150,10 +150,11 @@ Now that we have a way to verify passwords, and hash passwords, it is time to ha
 Inside the `Auth` class, add the following functions.  
 
 ```python
-def encode_token(self, username):
+    def encode_token(self, username):
         payload = {
             'exp' : datetime.utcnow() + timedelta(days=0, minutes=30),
             'iat' : datetime.utcnow(),
+	        'scope': 'access_token',
             'sub' : username
         }
         return jwt.encode(
@@ -162,17 +163,19 @@ def encode_token(self, username):
             algorithm='HS256'
         )
     
-def decode_token(self, token):
+    def decode_token(self, token):
         try:
             payload = jwt.decode(token, self.secret, algorithms=['HS256'])
-            return payload['sub']
+            if (payload['scope'] == 'access_token'):
+                return payload['sub']   
+            raise HTTPException(status_code=401, detail='Scope for the token is invalid')
         except jwt.ExpiredSignatureError:
             raise HTTPException(status_code=401, detail='Token expired')
         except jwt.InvalidTokenError:
             raise HTTPException(status_code=401, detail='Invalid token')
 ```
 
-The `encode_token` function takes a username as a parameter and uses `pyjwt` to create an `access_token`. We are using `timedelta` to set the expiry of the token for 30 mins. We can use this function inside the `/login` endpoint, and return a token to the client.
+The `encode_token` function takes a username as a parameter and uses `pyjwt` to create an `access_token`. We are using `timedelta` to set the expiry of the token for 30 mins. The scope parameter can be used to verify that the client uses an `access_token`. We can use this function inside the `/login` endpoint, and return a token to the client.
 
 `decode_token` takes a token as a parameter, and attempts to decode it using the `secret`. If there are any errors like expired token or an invalid token, we can simply raise an `HTTPException`. Otherwise, we can return the username. This will be helpful to us when the client interacts with protected data, functions, etc. We can use this function to simply verify if they have access to the response. 
 
@@ -182,9 +185,10 @@ When the token expires, the application forces the user to login. To avoid this,
 We need two more function to handle the `refresh_token` logic. 
 ```python
     def encode_refresh_token(self, username):
-    	payload = {
+        payload = {
             'exp' : datetime.utcnow() + timedelta(days=0, hours=10),
             'iat' : datetime.utcnow(),
+	        'scope': 'refresh_token',
             'sub' : username
         }
         return jwt.encode(
@@ -195,15 +199,17 @@ We need two more function to handle the `refresh_token` logic.
     def refresh_token(self, refresh_token):
         try:
             payload = jwt.decode(refresh_token, self.secret, algorithms=['HS256'])
-	    username = payload['sub']
-	    new_token = self.encode_token(username)
-            return new_token
-	except jwt.ExpiredSignatureError:
+            if (payload['scope'] == 'refresh_token'):
+                username = payload['sub']
+                new_token = self.encode_token(username)
+                return new_token
+            raise HTTPException(status_code=401, detail='Invalid scope for token')
+        except jwt.ExpiredSignatureError:
             raise HTTPException(status_code=401, detail='Refresh token expired')
         except jwt.InvalidTokenError:
             raise HTTPException(status_code=401, detail='Invalid refresh token')
 ```
-As you can tell, we are setting the expiry time of the `refresh_token` to be 10 hours which is more than the `access_token`. Plus, we are simply using `refresh_token` to create a new `access_token`.
+As you can tell, we are setting the expiry time of the `refresh_token` to be 10 hours which is more than the `access_token`. Plus, we are simply using `refresh_token` to create a new `access_token`. The `scope` parameter from JWT token ensures that the `refresh_token` is used only for creating new tokens, and `access_token` is used only for interacting with protected endpoints. 
 
 That is all we need for the auth logic! Here is what the file looks like at the end:
 
@@ -225,11 +231,12 @@ class Auth():
 
     def verify_password(self, password, encoded_password):
         return self.hasher.verify(password, encoded_password)
-    
+	
     def encode_token(self, username):
         payload = {
             'exp' : datetime.utcnow() + timedelta(days=0, minutes=30),
             'iat' : datetime.utcnow(),
+	        'scope': 'access_token',
             'sub' : username
         }
         return jwt.encode(
@@ -241,7 +248,9 @@ class Auth():
     def decode_token(self, token):
         try:
             payload = jwt.decode(token, self.secret, algorithms=['HS256'])
-            return payload['sub']
+            if (payload['scope'] == 'access_token'):
+                return payload['sub']   
+            raise HTTPException(status_code=401, detail='Scope for the token is invalid')
         except jwt.ExpiredSignatureError:
             raise HTTPException(status_code=401, detail='Token expired')
         except jwt.InvalidTokenError:
@@ -251,6 +260,7 @@ class Auth():
         payload = {
             'exp' : datetime.utcnow() + timedelta(days=0, hours=10),
             'iat' : datetime.utcnow(),
+	        'scope': 'refresh_token',
             'sub' : username
         }
         return jwt.encode(
@@ -258,13 +268,14 @@ class Auth():
             self.secret,
             algorithm='HS256'
         )
-    
     def refresh_token(self, refresh_token):
         try:
             payload = jwt.decode(refresh_token, self.secret, algorithms=['HS256'])
-            username = payload['sub']
-            new_token = self.encode_token(username)
-            return new_token
+            if (payload['scope'] == 'refresh_token'):
+                username = payload['sub']
+                new_token = self.encode_token(username)
+                return new_token
+            raise HTTPException(status_code=401, detail='Invalid scope for token')
         except jwt.ExpiredSignatureError:
             raise HTTPException(status_code=401, detail='Refresh token expired')
         except jwt.InvalidTokenError:
