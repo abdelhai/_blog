@@ -154,7 +154,7 @@ Inside the `Auth` class, add the following functions.
         payload = {
             'exp' : datetime.utcnow() + timedelta(days=0, minutes=30),
             'iat' : datetime.utcnow(),
-	        'scope': 'access_token',
+	    'scope': 'access_token',
             'sub' : username
         }
         return jwt.encode(
@@ -188,7 +188,7 @@ We need two more function to handle the `refresh_token` logic.
         payload = {
             'exp' : datetime.utcnow() + timedelta(days=0, hours=10),
             'iat' : datetime.utcnow(),
-	        'scope': 'refresh_token',
+	    'scope': 'refresh_token',
             'sub' : username
         }
         return jwt.encode(
@@ -236,7 +236,7 @@ class Auth():
         payload = {
             'exp' : datetime.utcnow() + timedelta(days=0, minutes=30),
             'iat' : datetime.utcnow(),
-	        'scope': 'access_token',
+	    'scope': 'access_token',
             'sub' : username
         }
         return jwt.encode(
@@ -260,7 +260,7 @@ class Auth():
         payload = {
             'exp' : datetime.utcnow() + timedelta(days=0, hours=10),
             'iat' : datetime.utcnow(),
-	        'scope': 'refresh_token',
+	    'scope': 'refresh_token',
             'sub' : username
         }
         return jwt.encode(
