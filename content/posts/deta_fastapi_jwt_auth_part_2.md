@@ -1,6 +1,6 @@
 ---
 title: "Get started with FastAPI JWT authentication – Part 2"
-date: 2021-04-21
+date: 2021-04-22
 draft: false
 ---
 # Get started with FastAPI JWT authentication – Part 2
